@@ -86,6 +86,11 @@ abstract class Item : Metadatable {
     abstract val dataMapper: MutableMap<String, String>
 
     /**
+     * 自定义 NBT 数据
+     */
+    abstract val customNbt: ConfigurationSection?
+
+    /**
      * 物品模型
      */
     abstract val model: MutableList<String>
@@ -188,4 +193,5 @@ abstract class Item : Metadatable {
         itemStream: ItemStream,
         namespace: String = "zaphkiel-internal",
     ): CompletableFuture<ItemEvent.ItemResult?>?
+
 }
