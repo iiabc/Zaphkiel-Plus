@@ -42,3 +42,26 @@ example_sword_2:
         when < 3 -> SLOW
         else -> VERY SLOW
       ]
+
+example_sword_3:
+  display: default_display_3
+  icon: iron_sword
+  name!!:
+    item_name: '&7Wooden Sword 3'
+  lore:
+    item_type: '&9Sword'
+    item_description:
+      - '&fCan be bought everywhere.'
+  data:
+    # 展示用数据，无实际作用
+    damage: 36
+  data-mapper:
+    damage: it
+    hello: it
+    type_damage: "&Zap.type.attack_damage"
+  # 自定义 NBT 路径
+  nbt:
+    hello: "world"
+    Zap:
+      type:
+        attack_damage: 123

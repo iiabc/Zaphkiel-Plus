@@ -12,3 +12,11 @@ default_display_2:
     - ''
     - '&a+<damage> Damage'
     - '&7+<attack-speed> AttackSpeed &8(<attack-speed-level>)'
+
+default_display_3:
+  name: '&7<item_name>'
+  lore:
+    - '&a+<damage> Damage'
+    - ''
+    - '&fNbt Content 1: &6<hello>'
+    - '&fNbt Content 2: &6<type_damage>'
