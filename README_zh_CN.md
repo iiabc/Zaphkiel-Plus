@@ -53,10 +53,6 @@ gradlew.bat clean build
 
 构建产物位于 `./build/libs` 文件夹。
 
-## 文档
-
-详细文档请访问我们的 [Wiki](https://github.com/TabooLib/zaphkiel/wiki)。
-
 ## 许可证
 
 本项目采用 CC0 1.0 Universal 许可证 - 详见 [LICENSE](https://www.google.com/search?q=LICENSE) 文件。
