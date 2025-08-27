@@ -59,9 +59,9 @@ example_sword_3:
     damage: it
     hello: it
     type_damage: "&Zap.type.attack_damage"
-  # 自定义 NBT 路径
-  nbt:
-    hello: "world"
-    Zap:
-      type:
-        attack_damage: 123
+  meta:
+    native:
+      hello: "world"
+      Zap:
+        type:
+          attack_damage: 123

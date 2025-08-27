@@ -61,8 +61,6 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
 
     override val dataMapper = config.getMap<Any, Any>("data-mapper").map { it.key.toString() to it.value.asList().joinToString("\n") }.toMap(HashMap())
 
-    override val customNbt = config.getConfigurationSection("nbt")
-
     override val model = config.getString("event.from")?.split(",")?.map { it.trim() }?.toMutableList() ?: arrayListOf()
 
     override val lockedData = getLockedData(HashMap(), data)
@@ -114,11 +112,6 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
         val compound = itemStream.sourceCompound.computeIfAbsent("zaphkiel") { ItemTag() }.asCompound()
         compound[ItemKey.ID.key] = ItemTagData(id)
         compound[ItemKey.DATA.key] = Translator.toItemTag(ItemTag(), data)
-
-        customNbt?.let { nbtSection ->
-            Translator.toItemTag(itemStream.sourceCompound, nbtSection)
-        }
-
         prepareCallback.accept(itemStream)
         return build(player, itemStream)
     }
