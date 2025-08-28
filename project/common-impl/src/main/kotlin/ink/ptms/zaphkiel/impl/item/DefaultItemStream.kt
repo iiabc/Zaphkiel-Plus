@@ -82,7 +82,8 @@ open class DefaultItemStream(sourceItem: ItemStack, sourceCompound: ItemTag = so
 
     override fun rebuild(player: Player?): ItemStream {
         val item = getZaphkielItem()
-        val itemStreamGenerated = DefaultItemStreamGenerated(sourceItem, item.name.toMutableMap(), item.lore.toMutableMap(), sourceCompound)
+        val itemStreamGenerated =
+            DefaultItemStreamGenerated(sourceItem, item.name.toMutableMap(), item.lore.toMutableMap(), sourceCompound)
         // 继承 Metadata 列表
         itemStreamGenerated.metadataList += metadataList
         return item.build(player, itemStreamGenerated)
@@ -90,7 +91,9 @@ open class DefaultItemStream(sourceItem: ItemStack, sourceCompound: ItemTag = so
 
     override fun rebuildToItemStack(player: Player?): ItemStack {
         // 若物品被损坏则跳过重构过程
-        return if (ItemSignal.DURABILITY_DESTROYED in signal) toItemStack(player) else rebuild(player).toItemStack(player)
+        return if (ItemSignal.DURABILITY_DESTROYED in signal) toItemStack(player) else rebuild(player).toItemStack(
+            player
+        )
     }
 
     override fun toItemStack(player: Player?): ItemStack {
@@ -151,7 +154,8 @@ open class DefaultItemStream(sourceItem: ItemStack, sourceCompound: ItemTag = so
         if (isVanilla()) {
             error("This item is not an extension item.")
         }
-        return getZaphkielCompound()!![ItemKey.META_HISTORY.key]?.asList()?.map { it.asString() }?.toList() ?: emptyList()
+        return getZaphkielCompound()!![ItemKey.META_HISTORY.key]?.asList()?.map { it.asString() }?.toList()
+            ?: emptyList()
     }
 
     override fun setZaphkielMetaHistory(meta: List<String>) {
