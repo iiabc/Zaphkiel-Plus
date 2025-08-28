@@ -3,6 +3,7 @@ package ink.ptms.zaphkiel.item.meta
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.module.nms.ItemTag
@@ -54,4 +55,19 @@ abstract class Meta(val root: ConfigurationSection) {
      */
     open fun drop(itemMeta: ItemMeta) {
     }
+
+    /**
+     * 在物品构建时构建
+     */
+    open fun build(itemStack: ItemStack): ItemStack {
+        return itemStack
+    }
+
+    /**
+     * 在物品构建时删除
+     */
+    open fun drop(itemStack: ItemStack): ItemStack {
+        return itemStack
+    }
+
 }
