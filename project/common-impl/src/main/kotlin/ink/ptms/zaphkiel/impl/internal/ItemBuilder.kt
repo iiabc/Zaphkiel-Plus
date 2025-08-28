@@ -5,7 +5,6 @@ import ink.ptms.zaphkiel.api.ItemSignal
 import ink.ptms.zaphkiel.api.event.ItemBuildEvent
 import ink.ptms.zaphkiel.api.event.ItemReleaseEvent
 import ink.ptms.zaphkiel.impl.item.DefaultItemStreamGenerated
-import org.bukkit.Material
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.reflect.Reflex.Companion.invokeConstructor
 import taboolib.common.util.unsafeLazy
@@ -105,9 +104,7 @@ internal object ItemBuilder {
         }
         e.item.meta.forEach { meta ->
             if (meta.locked || ItemSignal.UPDATE_CHECKED !in e.itemStream.signal) {
-                val a = meta.build(e.itemStack).clone()
-                a.type = Material.APPLE
-                e.itemStack = a
+                e.itemStack = meta.build(e.itemStack)
             }
         }
     }
