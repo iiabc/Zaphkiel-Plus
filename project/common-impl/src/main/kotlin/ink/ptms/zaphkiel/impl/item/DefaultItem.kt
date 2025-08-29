@@ -59,7 +59,9 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
 
     override val data = config.getConfigurationSection("data") ?: config.createSection("data")
 
-    override val dataMapper = config.getMap<Any, Any>("data-mapper").map { it.key.toString() to it.value.asList().joinToString("\n") }.toMap(HashMap())
+    override val dataMapper =
+        config.getMap<Any, Any>("data-mapper").map { it.key.toString() to it.value.asList().joinToString("\n") }
+            .toMap(HashMap())
 
     override val model = config.getString("event.from")?.split(",")?.map { it.trim() }?.toMutableList() ?: arrayListOf()
 
@@ -168,23 +170,76 @@ class DefaultItem(override val config: ConfigurationSection, override val group:
         giveItem(player, amount) { it.forEach { item -> player.world.dropItem(player.location, item) } }
     }
 
-    override fun invokeScript(key: List<String>, event: PlayerEvent, itemStream: ItemStream, namespace: String): CompletableFuture<ItemEvent.ItemResult?>? {
-        val itemEvent = eventMap.entries.firstOrNull { it.key in key }?.value ?: return null
+    override fun invokeScript(
+        key: List<String>,
+        event: PlayerEvent,
+        itemStream: ItemStream,
+        namespace: String
+    ): CompletableFuture<ItemEvent.ItemResult?>? {
+        val lang = event.player.locale
+        val dynamicEventMap = buildEventMapForLanguage(lang)
+
+        // 先从 i18n 事件中查找
+        var itemEvent = dynamicEventMap.entries.firstOrNull { it.key in key }?.value
+
+        // 如果没找到，回退到默认事件映射
+        if (itemEvent == null) {
+            itemEvent = eventMap.entries.firstOrNull { it.key in key }?.value ?: return null
+        }
+
         if (itemEvent.isCancelled && event is Cancellable) {
             event.isCancelled = true
         }
         return itemEvent.invoke(event.player, event, itemStream, eventVars, namespace)
     }
 
-    override fun invokeScript(key: List<String>, player: Player?, event: Event, itemStream: ItemStream, namespace: String): CompletableFuture<ItemEvent.ItemResult?>? {
-        val itemEvent = eventMap.entries.firstOrNull { it.key in key }?.value ?: return null
-        if (itemEvent.isCancelled && event is Cancellable) {
+    override fun invokeScript(
+        key: List<String>,
+        player: Player?,
+        event: Event,
+        itemStream: ItemStream,
+        namespace: String
+    ): CompletableFuture<ItemEvent.ItemResult?>? {
+        val lang = player?.locale
+
+        // 首先尝试从动态语言事件映射中查找
+        val itemEvent = if (lang != null) {
+            val dynamicEventMap = buildEventMapForLanguage(lang)
+            dynamicEventMap.entries.firstOrNull { it.key in key }?.value
+        } else null
+
+        // 如果没有找到语言特定的事件，回退到默认事件映射
+        val finalItemEvent = itemEvent ?: eventMap.entries.firstOrNull { it.key in key }?.value ?: return null
+
+        if (finalItemEvent.isCancelled && event is Cancellable) {
             event.isCancelled = true
         }
-        return itemEvent.invoke(player, event, itemStream, eventVars, namespace)
+        return finalItemEvent.invoke(player, event, itemStream, eventVars, namespace)
     }
 
-    fun getLockedData(map: MutableMap<String, ItemTagData?>, section: ConfigurationSection, path: String = ""): MutableMap<String, ItemTagData?> {
+    /**
+     * 构建 i18n 国际化语言事件
+     */
+    private fun buildEventMapForLanguage(lang: String): Map<String, ItemEvent> {
+        val field = HashMap<String, ItemEvent>()
+        if (model.isNotEmpty()) {
+            model.forEach {
+                val model = Zaphkiel.api().getItemManager().getModel(it)
+                if (model != null) {
+                    field.putAll(parseEvent(this, model.config, lang))
+                }
+            }
+        } else {
+            field.putAll(parseEvent(this, config, lang))
+        }
+        return field
+    }
+
+    fun getLockedData(
+        map: MutableMap<String, ItemTagData?>,
+        section: ConfigurationSection,
+        path: String = ""
+    ): MutableMap<String, ItemTagData?> {
         section.getKeys(false).forEach { key ->
             if (key.endsWith("!!")) {
                 map[path + key.substring(0, key.length - 2)] = Translator.toItemTag(config["data.$path$key"])

@@ -43,15 +43,16 @@ internal fun parseLore(config: ConfigurationSection): MutableMap<String, Mutable
     return map
 }
 
-internal fun parseEvent(item: Item, config: ConfigurationSection): MutableMap<String, ItemEvent> {
+internal fun parseEvent(item: Item, config: ConfigurationSection, lang: String = ""): MutableMap<String, ItemEvent> {
     val map = HashMap<String, ItemEvent>()
-    val event = config.getConfigurationSection("event") ?: return HashMap()
+    val path = if (lang.isNotEmpty()) "i18n.$lang.event" else "event"
+    val event = config.getConfigurationSection(path) ?: return HashMap()
     event.getKeys(false).forEach { key ->
         if (key.endsWith("!!")) {
-            val substring = key.substring(0, key.length - 2)
-            map[substring] = DefaultItemEvent(item, substring, config["event.$key"]!!.asList(), true)
+            val substring = key.dropLast(2)
+            map[substring] = DefaultItemEvent(item, substring, config["$path.$key"]!!.asList(), true)
         } else {
-            map[key] = DefaultItemEvent(item, key, config["event.$key"]!!.asList())
+            map[key] = DefaultItemEvent(item, key, config["$path.$key"]!!.asList())
         }
     }
     return map
