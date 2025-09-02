@@ -17,12 +17,18 @@ Zaphkiel 为创建、管理和使用具有丰富自定义选项的自定义物�
 
 ## 功能特性
 
+- **多语言支持** - 自动检测玩家客户端语言，提供本地化物品体验
 - **灵活的物品定义**: 使用 YAML 配置文件定义自定义物品
 - **动态显示系统**: 支持通过数据映射动态生成名称和描述
 - **事件驱动行为**: 使用 Kether 脚本实现自定义物品行为
 - **NBT 数据管理**: 高级 NBT 数据处理，支持自定义路径
 - **物品序列化**: 完整的序列化系统，支持数据库持久化
 - **插件集成**: 与流行的 Minecraft 插件无缝集成
+
+## 相关链接
+
+- [文档](https://iplugin.hiusers.com/docs/zaphkiel-plus)
+- [QQ 群](https://qm.qq.com/q/KqPuII5j2w)
 
 ## 架构
 
@@ -51,7 +57,7 @@ gradlew.bat clean build
 ./gradlew clean build
 ```
 
-构建产物位于 `./build/libs` 文件夹。
+构建产物位于 `./plugin/build/libs` 文件夹。
 
 ## 许可证
 
