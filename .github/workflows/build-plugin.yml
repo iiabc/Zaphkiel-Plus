@@ -1,6 +1,10 @@
-name: Build Plugin JAR (Dev Branch)
+name: Build Plugin
 
 on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -8,10 +12,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout dev branch
+      - name: Checkout main branch
         uses: actions/checkout@v4
-        with:
-          ref: dev
 
       - name: Set up JDK 8
         uses: actions/setup-java@v4
@@ -23,11 +25,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ~/.gradle/caches  
+            ~/.gradle/caches    
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-  
+            ${{ runner.os }}-gradle-    
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -43,4 +45,3 @@ jobs:
         with:
           name: Zaphkiel-plugin-${{ github.run_number }}
           path: plugin/build/libs/Zaphkiel-*.jar
-          retention-days: 1
