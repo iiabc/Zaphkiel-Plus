@@ -2,10 +2,10 @@ package ink.ptms.zaphkiel.impl.meta
 
 import ink.ptms.zaphkiel.item.meta.Meta
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import taboolib.common.util.asList
 import taboolib.library.configuration.ConfigurationSection
-import taboolib.module.nms.ItemTag
-import taboolib.module.nms.ItemTagList
+import taboolib.module.nms.*
 
 @MetaKey("can-destroy")
 class MetaCanDestroy(root: ConfigurationSection) : Meta(root) {
@@ -16,10 +16,12 @@ class MetaCanDestroy(root: ConfigurationSection) : Meta(root) {
         get() = "can-destroy"
 
     override fun build(player: Player?, compound: ItemTag) {
-        if (canDestroy == null || compound.containsKey("CanDestroy")) {
-            return
+        if (MinecraftVersion.versionId < 12005) {
+            if (canDestroy == null || compound.containsKey("CanDestroy")) {
+                return
+            }
+            compound.putDeep("CanDestroy", ItemTagList.of(*canDestroy.toTypedArray()))
         }
-        compound.putDeep("CanDestroy", ItemTagList.of(*canDestroy.toTypedArray()))
     }
 
     override fun drop(player: Player?, compound: ItemTag) {
@@ -29,4 +31,17 @@ class MetaCanDestroy(root: ConfigurationSection) : Meta(root) {
     override fun toString(): String {
         return "MetaCanDestroy(canDestroy=$canDestroy)"
     }
+
+    override fun build(itemStack: ItemStack): ItemStack {
+        if (canDestroy == null || MinecraftVersion.versionId < 12005) {
+            return itemStack
+        }
+        return itemStack.setItemCanBreak(canDestroy)
+    }
+
+    override fun drop(itemStack: ItemStack): ItemStack {
+        if (MinecraftVersion.versionId < 12005) return itemStack
+        return itemStack.removeItemCanBreak()
+    }
+
 }

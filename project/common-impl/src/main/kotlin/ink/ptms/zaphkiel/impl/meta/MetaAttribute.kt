@@ -6,12 +6,13 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.util.NumberConversions
-import taboolib.common.platform.function.info
-import taboolib.common.util.orNull
 import taboolib.common5.Coerce
 import taboolib.library.configuration.ConfigurationSection
 import taboolib.library.xseries.XAttribute
-import taboolib.module.nms.*
+import taboolib.module.nms.ItemTag
+import taboolib.module.nms.ItemTagData
+import taboolib.module.nms.ItemTagList
+import taboolib.module.nms.MinecraftVersion
 import taboolib.type.BukkitEquipment
 import java.util.*
 
@@ -58,10 +59,7 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
                                 if (attributeValue.endsWith("%")) {
                                     attribute["Amount"] = ItemTagData(
                                         NumberConversions.toDouble(
-                                            attributeValue.substring(
-                                                0,
-                                                attributeValue.length - 1
-                                            )
+                                            attributeValue.dropLast(1)
                                         ) / 100.0
                                     )
                                     attribute["Operation"] = ItemTagData(1)

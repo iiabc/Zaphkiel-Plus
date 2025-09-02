@@ -42,17 +42,50 @@ internal object ItemListener {
 
     @SubscribeEvent
     fun onBuildPre(e: ItemBuildEvent.Pre) {
-        e.itemStream.getZaphkielItem().invokeScript(listOf("on_build", "onBuild"), e.player, e, e.itemStream, "zaphkiel-build")
+        e.itemStream.getZaphkielItem()
+            .invokeScript(listOf("on_build", "onBuild"), e.player, e, e.itemStream, "zaphkiel-build")
     }
 
     @SubscribeEvent
     fun onRelease(e: ItemReleaseEvent) {
-        e.itemStream.getZaphkielItem().invokeScript(listOf("on_release", "onRelease"), e.player, e, e.itemStream, "zaphkiel-build")
+        e.itemStream.getZaphkielItem()
+            .invokeScript(listOf("on_release", "onRelease"), e.player, e, e.itemStream, "zaphkiel-build")
     }
 
     @SubscribeEvent
     fun onReleaseDisplay(e: ItemReleaseEvent.Display) {
-        e.itemStream.getZaphkielItem().invokeScript(listOf("on_release_display", "onReleaseDisplay"), e.player, e, e.itemStream, "zaphkiel-build")
+        e.itemStream.getZaphkielItem()
+            .invokeScript(listOf("on_release_display", "onReleaseDisplay"), e.player, e, e.itemStream, "zaphkiel-build")
+    }
+
+    /**
+     * i18n 国际化
+     */
+    @SubscribeEvent
+    fun i18nDisplay(e: ItemReleaseEvent.Display) {
+        val lang = e.player?.locale ?: return
+
+        val i18nSection = e.item.config.getConfigurationSection("i18n")
+        val langSection = i18nSection?.getConfigurationSection(lang)
+
+        if (langSection != null) {
+            // 处理 name
+            val nameSection = langSection.getConfigurationSection("name")
+            nameSection?.getKeys(false)?.forEach { key ->
+                e.name[key] = nameSection.getString(key)!!
+            }
+
+            // 处理 lore
+            val loreSection = langSection.getConfigurationSection("lore")
+            loreSection?.getKeys(false)?.forEach { key ->
+                val loreValue = if (loreSection.isList(key)) {
+                    loreSection.getStringList(key).toMutableList()
+                } else {
+                    mutableListOf(loreSection.getString(key)!!)
+                }
+                e.lore[key] = loreValue
+            }
+        }
     }
 
     @SubscribeEvent
@@ -164,7 +197,8 @@ internal object ItemListener {
                 if (event.save) {
                     event.itemStream.rebuildToItemStack(e.player)
                 }
-                itemStream.getZaphkielItem().invokeScript(listOf("on_right_click_entity", "onRightClickEntity"), e, itemStream)
+                itemStream.getZaphkielItem()
+                    .invokeScript(listOf("on_right_click_entity", "onRightClickEntity"), e, itemStream)
             }
         }
     }
@@ -178,13 +212,15 @@ internal object ItemListener {
         if (e.offHandItem.isNotAir()) {
             val itemStream = e.offHandItem!!.toItemStream()
             if (itemStream.isExtension()) {
-                itemStream.getZaphkielItem().invokeScript(listOf("on_swap_to_offhand", "onSwapToOffhand"), e, itemStream)
+                itemStream.getZaphkielItem()
+                    .invokeScript(listOf("on_swap_to_offhand", "onSwapToOffhand"), e, itemStream)
             }
         }
         if (e.mainHandItem.isNotAir()) {
             val itemStream = e.mainHandItem!!.toItemStream()
             if (itemStream.isExtension()) {
-                itemStream.getZaphkielItem().invokeScript(listOf("on_swap_to_mainhand", "onSwapToMainHand"), e, itemStream)
+                itemStream.getZaphkielItem()
+                    .invokeScript(listOf("on_swap_to_mainhand", "onSwapToMainHand"), e, itemStream)
             }
         }
     }
@@ -236,11 +272,12 @@ internal object ItemListener {
                 e.itemDrop.itemStack = event.itemStream.rebuildToItemStack(e.player)
             }
             // 若脚本修改物品则写回事件
-            itemStream.getZaphkielItem().invokeScript(listOf("on_drop", "onDrop"), e.player, e, itemStream)?.thenAccept {
-                if (it != null) {
-                    e.itemDrop.itemStack = it.itemStack
+            itemStream.getZaphkielItem().invokeScript(listOf("on_drop", "onDrop"), e.player, e, itemStream)
+                ?.thenAccept {
+                    if (it != null) {
+                        e.itemDrop.itemStack = it.itemStack
+                    }
                 }
-            }
         }
     }
 
@@ -261,11 +298,13 @@ internal object ItemListener {
             //     e.item.itemStack = event.itemStream.rebuildToItemStack(e.player)
             // }
             // 若脚本修改物品则写回事件
-            itemStream.getZaphkielItem().invokeScript(listOf("on_pick", "on_pickup", "onPick", "onPickUp"), e.player, e, itemStream)?.thenAccept {
-            //     if (it != null) {
-            //         e.item.itemStack = it.itemStack
-            //     }
-            }
+            itemStream.getZaphkielItem()
+                .invokeScript(listOf("on_pick", "on_pickup", "onPick", "onPickUp"), e.player, e, itemStream)
+                ?.thenAccept {
+                    //     if (it != null) {
+                    //         e.item.itemStack = it.itemStack
+                    //     }
+                }
         }
     }
 

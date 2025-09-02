@@ -6,8 +6,8 @@ import org.serverct.ersha.api.AttributeAPI
 import org.serverct.ersha.attribute.data.AttributeData
 import taboolib.common.platform.event.OptionalEvent
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.library.reflex.Reflex.Companion.getProperty
 import taboolib.common5.Coerce
+import taboolib.library.reflex.Reflex.Companion.getProperty
 import taboolib.platform.util.isAir
 import taboolib.type.BukkitEquipment
 
@@ -23,13 +23,13 @@ internal object AttributePlusHook {
             items.forEachIndexed { index, item ->
                 AttributeAPI.takeSourceAttribute(attrData, "Zaphkiel.$index")
                 if (item.isAir()) {
-                    return
+                    return@forEachIndexed
                 }
                 val itemStream = item.toItemStream()
                 if (itemStream.isVanilla()) {
-                    return
+                    return@forEachIndexed
                 }
-                val attribute = itemStream.getZaphkielData()["attribute-plus"]?.asCompound() ?: return
+                val attribute = itemStream.getZaphkielData()["attribute-plus"]?.asCompound() ?: return@forEachIndexed
                 val map = HashMap<String, Array<Number>>()
                 attribute.forEach { (key, data) ->
                     val args = data.asString().split("-")

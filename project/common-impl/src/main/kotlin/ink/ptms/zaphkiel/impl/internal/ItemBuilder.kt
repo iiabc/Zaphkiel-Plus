@@ -19,7 +19,8 @@ import taboolib.module.configuration.Type
 internal object ItemBuilder {
 
     val dropMeta by unsafeLazy {
-        Zaphkiel.api().getItemManager().getMetaMap().map { it.value.invokeConstructor(Configuration.empty(Type.YAML)) }.associateBy { it.id }
+        Zaphkiel.api().getItemManager().getMetaMap().map { it.value.invokeConstructor(Configuration.empty(Type.YAML)) }
+            .associateBy { it.id }
     }
 
     @SubscribeEvent
@@ -75,7 +76,12 @@ internal object ItemBuilder {
                 var display = Zaphkiel.api().getItemManager().getDisplay(e.item.display)
                 if (display != null) {
                     display = ItemReleaseEvent.SelectDisplay(e.itemStream, display, e.player).also { it.call() }.display
-                    val event = ItemReleaseEvent.Display(itemStream, e.item.name.toMutableMap(), e.item.lore.toMutableMap(), e.player)
+                    val event = ItemReleaseEvent.Display(
+                        itemStream,
+                        e.item.name.toMutableMap(),
+                        e.item.lore.toMutableMap(),
+                        e.player
+                    )
                     event.call()
                     val product = display.build(event.name, event.lore)
                     if (e.item.nameLocked) {
@@ -88,4 +94,19 @@ internal object ItemBuilder {
             }
         }
     }
+
+    @SubscribeEvent
+    fun onFinal(e: ItemReleaseEvent.Final) {
+        e.itemStream.dropMeta.forEach {
+            dropMeta[it]?.drop(e.itemStack)?.let { itemStack ->
+                e.itemStack = itemStack
+            }
+        }
+        e.item.meta.forEach { meta ->
+            if (meta.locked || ItemSignal.UPDATE_CHECKED !in e.itemStream.signal) {
+                e.itemStack = meta.build(e.itemStack)
+            }
+        }
+    }
+
 }
