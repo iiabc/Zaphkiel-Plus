@@ -35,14 +35,12 @@ jobs:
       - name: Clean and build with Gradle
         run: ./gradlew clean build
 
-      - name: List build artifacts
-        run: find . -name "*.jar" -path "*/build/libs/*" -type f
+      - name: List plugin artifacts
+        run: find ./plugin/build/libs -name "*.jar" -type f
 
-      - name: Upload build artifacts
+      - name: Upload plugin JAR
         uses: actions/upload-artifact@v4
         with:
-          name: plugin-jars-${{ github.run_number }}
-          path: |
-            **/build/libs/*.jar  
-            !**/build/libs/*-sources.jar
+          name: Zaphkiel-plugin-${{ github.run_number }}
+          path: plugin/build/libs/Zaphkiel-*.jar
           retention-days: 1
