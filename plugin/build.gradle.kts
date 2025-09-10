@@ -1,5 +1,6 @@
 dependencies {
     taboo("ink.ptms:um:1.1.5")
+    taboo("com.notkamui.libs:keval:1.1.1")
 }
 
 taboolib {
@@ -10,6 +11,7 @@ taboolib {
         }
     }
     relocate("ink.ptms.um", "ink.ptms.zaphkiel.um")
+    relocate("com.notkamui.keval", "ink.ptms.zaphkiel.libs.keval")
 }
 
 tasks {
