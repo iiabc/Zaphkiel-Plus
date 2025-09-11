@@ -10,4 +10,5 @@ dependencies {
     compileOnly("public:HeadDatabase:1.3.0")
     compileOnly("public:Tiphareth:1.0.0")
     compileOnly("ink.ptms:um:1.1.5")
+    compileOnly("com.notkamui.libs:keval:1.1.1")
 }
