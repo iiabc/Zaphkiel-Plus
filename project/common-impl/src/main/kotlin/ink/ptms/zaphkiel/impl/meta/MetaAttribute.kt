@@ -1,6 +1,7 @@
 package ink.ptms.zaphkiel.impl.meta
 
 import ink.ptms.zaphkiel.item.meta.Meta
+import ink.ptms.zaphkiel.api.Attributes
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -44,12 +45,7 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
                                 amount = Coerce.toDouble(attributeValue)
                                 operation = AttributeModifier.Operation.ADD_NUMBER
                             }
-                            val modifier = if (equipmentSlot != null) {
-                                AttributeModifier(UUID.randomUUID(), "zaphkiel", amount, operation, equipmentSlot)
-                            } else {
-                                AttributeModifier(UUID.randomUUID(), "zaphkiel", amount, operation)
-                            }
-                            org.bukkit.attribute.Attribute.GENERIC_ATTACK_SPEED
+                            val modifier = Attributes.createAttributeModifier("zaphkiel", amount, operation, equipmentSlot)
                             attributeList.add(bukkitAttribute to modifier)
                         } else {
                             try {
@@ -101,7 +97,7 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
             val modifiers = itemMeta.attributeModifiers
             attributeList.forEach {
                 // Cannot register AttributeModifier. Modifier is already applied!
-                if (modifiers == null || modifiers.values().none { a -> a.uniqueId == it.second.uniqueId }) {
+                if (modifiers == null || modifiers.values().none { a -> getModifierIdentity(a) == getModifierIdentity(it.second) }) {
                     itemMeta.addAttributeModifier(it.first, it.second)
                 }
             }
@@ -122,5 +118,28 @@ class MetaAttribute(root: ConfigurationSection) : Meta(root) {
 
     fun toArray(m: Long, l: Long): IntArray {
         return intArrayOf((m shr 32).toInt(), m.toInt(), (l shr 32).toInt(), l.toInt())
+    }
+
+    // 适配逻辑已迁移至 common Attributes.factory
+
+    /**
+     * 获取 AttributeModifier 的稳定标识：优先使用 Key（新 API），否则回退到 UUID（旧 API）。
+     */
+    private fun getModifierIdentity(modifier: AttributeModifier): Any? {
+        // 尝试调用 getKey()
+        try {
+            val m = modifier.javaClass.getMethod("getKey")
+            val key = m.invoke(modifier)
+            if (key != null) return key
+        } catch (_: Throwable) {
+            // 忽略
+        }
+        // 回退到 UUID（兼容旧版）
+        return try {
+            modifier.uniqueId
+        } catch (_: Throwable) {
+            // 最后回退到 name + amount + operation 组合
+            modifier.name + ":" + modifier.amount + ":" + modifier.operation.name
+        }
     }
 }

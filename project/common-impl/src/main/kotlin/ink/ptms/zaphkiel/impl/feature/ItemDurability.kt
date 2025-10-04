@@ -9,7 +9,6 @@ import ink.ptms.zaphkiel.impl.DefaultZapAPI
 import ink.ptms.zaphkiel.impl.item.DefaultItemStream
 import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemBreakEvent
@@ -23,9 +22,11 @@ import taboolib.common.platform.function.submitAsync
 import taboolib.common.util.random
 import taboolib.common5.Coerce
 import taboolib.common5.util.createBar
+import taboolib.library.xseries.ProxyParticle
 import taboolib.library.xseries.parseToMaterial
 import taboolib.module.nms.ItemTagData
 import taboolib.module.nms.getItemTag
+
 
 /**
  * @author sky
@@ -36,7 +37,13 @@ object ItemDurability {
     var durability: String? = null
     var durabilitySymbol: List<String>? = null
 
-    fun createBar(current: Int, max: Int, display: String = durability!!, symbol: List<String> = durabilitySymbol!!, scale: Int = -1): String {
+    fun createBar(
+        current: Int,
+        max: Int,
+        display: String = durability!!,
+        symbol: List<String> = durabilitySymbol!!,
+        scale: Int = -1
+    ): String {
         val percent = Coerce.format((current / max.toDouble()) * 100).toString()
         return if (scale == -1) {
             display.replace("%symbol%", (1..max).joinToString("") { i ->
@@ -177,13 +184,25 @@ fun ItemStream.repairItem(value: Int, player: Player? = null, broken: Boolean = 
                         if (itemStack.type.maxDurability > 0) {
                             player.playSound(player.location, Sound.ENTITY_ITEM_BREAK, 1f, random(0.5, 1.5).toFloat())
                         }
-                        player.world.spawnParticle(Particle.ITEM_CRACK, player.location.add(0.0, 1.0, 0.0), 15, 0.0, 0.0, 0.0, 0.1, itemStack)
+                        ProxyParticle.EGG_CRACK.get()?.let { particle ->
+                            player.world.spawnParticle(
+                                particle,
+                                player.location.add(0.0, 1.0, 0.0),
+                                15,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.1,
+                                itemStack
+                            )
+                        }
                     }
                 }
                 sourceItem.amount = 0
             }
             false
         }
+
         else -> false
     }
 }
