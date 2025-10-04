@@ -1,16 +1,23 @@
 package ink.ptms.zaphkiel.impl.feature.kether
 
 import ink.ptms.zaphkiel.api.ItemSignal
+import ink.ptms.zaphkiel.api.ItemStream
 import ink.ptms.zaphkiel.impl.Translator
 import ink.ptms.zaphkiel.impl.feature.damageItem
 import ink.ptms.zaphkiel.impl.feature.getCurrentDurability
 import ink.ptms.zaphkiel.impl.feature.getMaxDurability
 import ink.ptms.zaphkiel.impl.feature.repairItem
+import ink.ptms.zaphkiel.impl.item.toItemStream
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import taboolib.module.kether.*
 import taboolib.module.nms.ItemTagData
+import taboolib.platform.util.isNotAir
 
 /**
+ * item select {ItemStack}
+ * item is-zaphkiel
+ * item id
  * item durability
  * item max-durability
  * item consume
@@ -21,9 +28,59 @@ import taboolib.module.nms.ItemTagData
  * item data key to 1
  * item data key to ~
  */
-@KetherParser(["item", "zitem"])
+@KetherParser(["item", "zitem"], namespace = "zaphkiel", shared = true)
 private fun parserItem() = scriptParser {
     it.switch {
+        // 判断是否为 zaphkiel 物品
+        case("is-zaphkiel", "is-extension") {
+            val expr = it.nextParsedAction()
+            actionFuture { future ->
+                run(expr).thenAccept { result ->
+                    val stream = when (result) {
+                        is ItemStream -> result
+                        is ItemStack -> try {
+                            if (result.isNotAir()) {
+                                result.toItemStream()
+                            } else {
+                                null
+                            }
+                        } catch (_: Throwable) {
+                            null
+                        }
+
+                        else -> null
+                    }
+                    future.complete(stream?.isExtension() == true)
+                }
+            }
+        }
+        // 选择物品：将给定的 ItemStack/ItemStream 写入 @ItemStream
+        case("select") {
+            val expr = it.nextParsedAction()
+            actionFuture { future ->
+                run(expr).thenAccept { result ->
+                    val selected = when (result) {
+                        is ItemStream -> result
+                        is ItemStack -> try {
+                            if (result.isNotAir()) {
+                                result.toItemStream()
+                            } else {
+                                null
+                            }
+                        } catch (ex: Throwable) {
+                            error("Not a zaphkiel item")
+                        }
+
+                        else -> error("Not a zaphkiel item")
+                    }
+                    variables().set("@ItemStream", selected)
+                    future.complete(selected)
+                }
+            }
+        }
+        case("id") {
+            actionNow { itemStream().getZaphkielId() }
+        }
         case("durability") {
             actionNow { itemStream().getCurrentDurability() }
         }
@@ -70,7 +127,11 @@ private fun parserItem() = scriptParser {
                     }
                     // 设置
                     else if (key != "~") {
-                        run(value).str { value -> f.complete(itemStream().getZaphkielData().putDeep(key, ItemTagData.toNBT(value))) }
+                        run(value).str { value ->
+                            f.complete(
+                                itemStream().getZaphkielData().putDeep(key, ItemTagData.toNBT(value))
+                            )
+                        }
                     }
                     // 移除
                     else {
