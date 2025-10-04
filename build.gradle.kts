@@ -34,7 +34,6 @@ subprojects {
         compileOnly("org.apache.commons:commons-lang3:3.12.0")
         compileOnly("com.google.guava:guava:30.1.1-jre")
         compileOnly("com.google.code.gson:gson:2.8.8")
-        // core 版本依赖下放到各子模块维护
         compileOnly(kotlin("stdlib"))
     }
 
