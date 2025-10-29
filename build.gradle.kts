@@ -18,10 +18,10 @@ subprojects {
     taboolib {
         env {
             install(Basic, Bukkit, BukkitUtil, BukkitNMS, BukkitNMSUtil, BukkitUI, BukkitHook)
-            install(Database, Kether, DatabasePlayer, Jexl)
+            install(Database, Kether, DatabasePlayer, Jexl, JavaScript)
             install(CommandHelper)
         }
-        version { taboolib = "6.2.3-e102d76" }
+        version { taboolib = "6.2.3-d4a5f0ea" }
     }
 
     // 全局仓库
