@@ -21,7 +21,7 @@ subprojects {
             install(Database, Kether, DatabasePlayer, Jexl, JavaScript)
             install(CommandHelper)
         }
-        version { taboolib = "6.2.3-d4a5f0ea" }
+        version { taboolib = "6.2.4-1645904" }
     }
 
     // 全局仓库
