@@ -34,6 +34,7 @@ event-driven behaviors, and advanced NBT data management.
 ## Related Links
 
 - [Documentation](https://iplugin.hiusers.com/en/docs/zaphkiel-plus)
+- [Zaphkiel-Plus Download](https://pakko.hiusers.com/resource/zaphkiel-plus)
 
 ## Architecture
 

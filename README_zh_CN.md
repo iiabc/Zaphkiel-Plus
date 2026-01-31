@@ -28,6 +28,7 @@ Zaphkiel 为创建、管理和使用具有丰富自定义选项的自定义物�
 ## 相关链接
 
 - [文档](https://iplugin.hiusers.com/docs/zaphkiel-plus)
+- [下载](https://pakko.hiusers.com/resource/zaphkiel-plus)
 - [QQ 群](https://qm.qq.com/q/KqPuII5j2w)
 
 ## 架构
